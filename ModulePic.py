@@ -94,16 +94,17 @@ class PIC:
             (Image.fromarray(np_im)).save(self.save_path + name + '_NPscreen.png')
         return np_im
 
-    def hash_image_compare(self, img, sample_name, score_mode, opencv=None):
+    def hash_image_compare(self, img, sample_name, score_mode, opencv=None, my_hash_size=8):
         if opencv:
             img = Image.fromarray(img)
         hash_log = self.log.debug
         self.log.debug(self.sampleImage[sample_name])
         Sample_img = Image.open(self.sampleImage[sample_name])
+
         if score_mode == 'avgP':
             # use phash and average_hash sum
-            pHash_sum = abs(imagehash.phash(Sample_img) - imagehash.phash(img))
-            avgHash_sum = abs(imagehash.average_hash(Sample_img) - imagehash.average_hash(img))
+            pHash_sum = abs(imagehash.phash(Sample_img, hash_size=my_hash_size) - imagehash.phash(img, hash_size=my_hash_size))
+            avgHash_sum = abs(imagehash.average_hash(Sample_img, hash_size=my_hash_size) - imagehash.average_hash(img, hash_size=my_hash_size))
             hash_log('pHash_sum : %s' % pHash_sum)
             hash_log('avgHash_sum : %s' % avgHash_sum)
             score = (pHash_sum * 2) + avgHash_sum
@@ -153,10 +154,10 @@ if __name__ == "__main__":
     red_low = [0, 225, 150]
     red_up = [0, 255, 255]
 
-    '''
+    #'''
     lm = obj.PIL_grab_image(hwnd=my_hwnd, name='LM')
-    crop = obj.PIL_image_crop(name='red_water', screen=lm, coordinate=red_water)
-    result = obj.hash_image_compare(crop, 'redWater', score_mode='avgP')
+    crop = obj.PIL_image_crop(name='kill', screen=lm, coordinate=kill)
+    result = obj.hash_image_compare(crop, 'kill', score_mode='avgP', my_hash_size=3)
 
     '''
     lm = obj.PIL_grab_image(hwnd=my_hwnd, name='LM_now')
@@ -167,7 +168,7 @@ if __name__ == "__main__":
     # detect_colors = obj.detect_colors(crop, [10,255,127], [0,43,46], 'hp')
     # crop = obj.PIL_image_crop(name='hp_bar', screen=lm, coordinate=hp_bar)
     #print(obj.hash_image_compare(crop,'hpBar', score_mode='avgP', opencv='on'))
-
+    '''
     '''
     compare = []
     import time
@@ -180,6 +181,6 @@ if __name__ == "__main__":
     print('AVG: %s' % np.mean(compare))
     print('max: %s' % np.max(compare))
     print('min: %s' % np.min(compare))
-    #'''
+    '''
 
 

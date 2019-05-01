@@ -22,6 +22,7 @@ class LM:
 
             self.rangedWeapon = int(getline(path + 'my_momo.txt', 5).strip().split('=')[1]) - 1
             self.killCheck = int(getline(path + 'my_momo.txt', 6).strip().split('=')[1])
+            self.offpc = int(getline(path + 'my_momo.txt', 7).strip().split('=')[1])
 
             self.btn_map = {'F1': ['541', '635'], 'F2': ['623', '635'], 'F3': ['705', '635'], 'F4': ['787', '635'],
                        'F5': ['960', '635'], 'F6': ['1042', '635'], 'F7': ['1125', '635'], 'F8': ['1205', '635'],
@@ -59,6 +60,8 @@ class LM:
         m, s = divmod(total_time, 60)
         h, m = divmod(m, 60)
         print(u"執行總時間為 %02d:%02d:%02d" % (h, m, s))
+        if self.offpc == 1:
+            self.ADB.quit_momo()
 
     def check_hp_bar(self):
         hp_bar = {'x': 80, 'y': 20, 'w': 214, 'h': 17}
@@ -93,9 +96,9 @@ class LM:
         while self.LM_screen_th_run == 0:
             red_water = {'x': 1181, 'y': 648, 'w': 55, 'h': 64}
             red_water_img = self.PIC.PIL_image_crop(screen=self.LM_screen, coordinate=red_water, name=None)
-            score = self.PIC.hash_image_compare(img=red_water_img, sample_name='redWater', score_mode='avgP')
+            score = self.PIC.hash_image_compare(img=red_water_img, sample_name='redWater', score_mode='avgP', my_hash_size=3)
             self.log.debug('red: %s' % score)
-            if score <= 16:
+            if score == 0:
                 print(u'%s 沒水了，回村(F8), 數值:%s' % (datetime.now().strftime('%Y-%m-%d_%H:%M:%S'), score))
                 self.log.info(u'%s 沒水了，回村(F8), 數值:%s' % (datetime.now().strftime('%Y-%m-%d_%H:%M:%S'), score))
                 self.ADB.ld_touch(btn_position=self.btn_map['F8'])
@@ -129,9 +132,9 @@ class LM:
             # kill = {'x': 1182, 'y': 358, 'w': 12, 'h': 7}
             kill = {'x': 1258, 'y': 383, 'w': 31, 'h': 7}
             kill_img = self.PIC.PIL_image_crop(screen=self.LM_screen, coordinate=kill, name=None)
-            score = self.PIC.hash_image_compare(img=kill_img, sample_name='kill', score_mode='avg')
+            score = self.PIC.hash_image_compare(img=kill_img, sample_name='kill', score_mode='avg', my_hash_size=3)
 
-            if score > 20:
+            if score >= 4:
                 print(u'檢查打怪(kill): %s 沒有打到怪，順飛(F1), 目前數值: %s' % (datetime.now().strftime('%Y-%m-%d_%H:%M:%S'), score))
                 self.log.info(u'檢查打怪(kill): %s 沒有打到怪，順飛(F1), 目前數值: %s' % (datetime.now().strftime('%Y-%m-%d_%H:%M:%S'), score))
                 self.ADB.ld_touch(btn_position=self.btn_map['F1'])

@@ -84,6 +84,10 @@ class ADB:
         self.call_ldconsole(["downcpu", "--index", self.momo["index"], "--rate", "50"])
         self.log.info("set down_cpu rate 50")
 
+    def quit_momo(self):
+        self.call_ldconsole(["quit", "--index", self.momo["index"]])
+        self.log.info("Quit momo index: %s" % self.momo['index'])
+
 
 if __name__ == "__main__":
     obj = ADB(momo_path=r'../Data/')
