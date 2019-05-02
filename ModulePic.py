@@ -97,7 +97,7 @@ class PIC:
     def hash_image_compare(self, img, sample_name, score_mode, opencv=None, my_hash_size=8):
         if opencv:
             img = Image.fromarray(img)
-        hash_log = self.log.debug
+        hash_log = self.log.info
         self.log.debug(self.sampleImage[sample_name])
         Sample_img = Image.open(self.sampleImage[sample_name])
 
@@ -143,6 +143,7 @@ class PIC:
         self.log.debug(white_count)
         return white_count
 
+
 if __name__ == "__main__":
     obj = PIC(path=r'./Data/')
     my_hwnd = obj.ADB.momo_hwnd()
@@ -156,8 +157,8 @@ if __name__ == "__main__":
 
     #'''
     lm = obj.PIL_grab_image(hwnd=my_hwnd, name='LM')
-    crop = obj.PIL_image_crop(name='kill', screen=lm, coordinate=kill)
-    result = obj.hash_image_compare(crop, 'kill', score_mode='avgP', my_hash_size=3)
+    crop = obj.PIL_image_crop(name='arrow', screen=lm, coordinate=arrow)
+    result = obj.hash_image_compare(crop, 'arrow', score_mode='avgP', my_hash_size=4)
 
     '''
     lm = obj.PIL_grab_image(hwnd=my_hwnd, name='LM_now')

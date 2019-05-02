@@ -3,7 +3,7 @@ from ModuleMyLog import MyLOG
 import re
 from linecache import getline
 import os
-
+import time
 
 class ADB:
     def __init__(self, momo_path):
@@ -17,6 +17,7 @@ class ADB:
             exit(0)
         else:
             self.momo = dict()
+            self.momo["data"] = os.getcwd() + momo_path
             self.momo["path"] = getline(momo_path + 'my_momo.txt', 3).strip().split('=')[1]
             self.momo["index"] = (getline(momo_path + 'my_momo.txt', 4).strip()).split('=')[1]
 
@@ -88,6 +89,49 @@ class ADB:
         self.call_ldconsole(["quit", "--index", self.momo["index"]])
         self.log.info("Quit momo index: %s" % self.momo['index'])
 
+    def powershell_off_pc(self):
+        # use powershell command
+        def powershell_output(ps_cmd):
+            ps = subprocess.Popen(
+                'powershell ' + ps_cmd, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE,
+                stderr=subprocess.PIPE, encoding='utf8'
+            )
+            # self.log.info(ps)
+            end = []
+            for line in ps.stdout.readlines():
+                # self.log.info(line)
+                if '\n' in line:
+                    line = line.strip()
+                end.append(line)
+            return end
+
+        pc_momo_process = powershell_output('(Get-Process -Name "dnplayer" -ErrorAction SilentlyContinue).Id')
+        self.log.info(pc_momo_process)
+        if not pc_momo_process:
+            self.log.info(u'60秒後關機')
+            subprocess.Popen("powershell Stop-Computer -ComputerName '.' -Force -ThrottleLimit 10")
+        else:
+            self.log.info(u'還有其他 MOMO模擬器 執行中')
+            exit(0)
+
+
+        '''
+        ps_check_momo_process = ['powershell', '(Get-Process -Name "dnplayer" -ErrorAction SilentlyContinue).Id']
+        self.log.info(ps_check_momo_process)
+        ps_output = subprocess.Popen(
+            ps_check_momo_process, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE,
+            encoding='utf8')
+        self.log.info(ps_output)
+        end = []
+        for line in ps_output.stdout.readlines():
+            self.log.info(line)
+            if '\n' in line:
+                line = line.strip()
+            end.append(line)
+
+        self.log.info(end)
+        '''
 
 if __name__ == "__main__":
-    obj = ADB(momo_path=r'../Data/')
+    obj = ADB(momo_path=r'./Data/')
+    obj.powershell_off_pc()

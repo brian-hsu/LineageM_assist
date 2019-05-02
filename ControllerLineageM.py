@@ -60,8 +60,10 @@ class LM:
         m, s = divmod(total_time, 60)
         h, m = divmod(m, 60)
         print(u"執行總時間為 %02d:%02d:%02d" % (h, m, s))
+        self.log.info(u"執行總時間為 %02d:%02d:%02d" % (h, m, s))
         if self.offpc == 1:
             self.ADB.quit_momo()
+            self.ADB.powershell_off_pc()
 
     def check_hp_bar(self):
         hp_bar = {'x': 80, 'y': 20, 'w': 214, 'h': 17}
@@ -73,7 +75,7 @@ class LM:
         red_up = [0, 255, 255]
         mask = self.PIC.detect_colors(crop, red_low, red_up)
         first_white_count = self.PIC.white_count(mask, 255)
-        limit_count = int(first_white_count * 0.55)
+        limit_count = int(first_white_count * 0.45)
         self.log.info('limit_count: %s' % limit_count)
         while self.LM_screen_th_run == 0:
             hp_bar_cvimg = self.PIC.image_turn_cv(self.LM_screen)
@@ -107,14 +109,14 @@ class LM:
             time.sleep(2)
 
     def check_ranged_weapon(self):
-        score = [19, 20]
+        score = [4, 4]
         cus_str = [u'沒有銀箭了，回村(F8)', u'沒有銀彈了，回村(F8)']
         sample = ['arrow', 'bullet']
         coordinate = [{'x': 1080, 'y': 643, 'w': 69, 'h': 68}, {'x': 1080, 'y': 643, 'w': 69, 'h': 68}]
 
         while self.LM_screen_th_run == 0:
             ranged_weapon_img = self.PIC.PIL_image_crop(screen=self.LM_screen, coordinate=coordinate[self.rangedWeapon], name=None)
-            hash_score = self.PIC.hash_image_compare(img=ranged_weapon_img, sample_name=sample[self.rangedWeapon], score_mode='avgP')
+            hash_score = self.PIC.hash_image_compare(img=ranged_weapon_img, sample_name=sample[self.rangedWeapon], score_mode='avgP', my_hash_size=4)
             self.log.debug('hash_score: %s' % hash_score)
             if hash_score < score[self.rangedWeapon]:
                 print(u'%s %s, 數值: %s' % (datetime.now().strftime('%Y-%m-%d_%H:%M:%S'), cus_str[self.rangedWeapon], hash_score))
@@ -134,7 +136,7 @@ class LM:
             kill_img = self.PIC.PIL_image_crop(screen=self.LM_screen, coordinate=kill, name=None)
             score = self.PIC.hash_image_compare(img=kill_img, sample_name='kill', score_mode='avg', my_hash_size=3)
 
-            if score >= 4:
+            if score >= 25:
                 print(u'檢查打怪(kill): %s 沒有打到怪，順飛(F1), 目前數值: %s' % (datetime.now().strftime('%Y-%m-%d_%H:%M:%S'), score))
                 self.log.info(u'檢查打怪(kill): %s 沒有打到怪，順飛(F1), 目前數值: %s' % (datetime.now().strftime('%Y-%m-%d_%H:%M:%S'), score))
                 self.ADB.ld_touch(btn_position=self.btn_map['F1'])
